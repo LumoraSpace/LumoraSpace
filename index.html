@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LumoraSpace — Sleep like you're weightless</title>
+<meta name="description" content="Sleep like you're weightless. LumoraSpace pillows use adaptive cooling and zero-pressure tech for the deepest sleep of your life.">
+<meta property="og:title" content="LumoraSpace — Sleep like you're weightless">
+<meta property="og:description" content="Adaptive cooling. Zero-pressure support. Engineered for the space between waking and dreams.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05060F;
+  --bg2: #0A0B1E;
+  --purple: #7B6FD4;
+  --purple-light: #A99EF5;
+  --purple-dim: #3D3870;
+  --purple-muted: #1E1C45;
+  --text: #E8E4FF;
+  --text-mid: #8884B0;
+  --text-dim: #4A486A;
+  --border: rgba(61,56,112,0.4);
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'DM Sans', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* Custom cursor */
+.cursor {
+  width: 8px; height: 8px;
+  background: var(--purple);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  transform: translate(-50%, -50%);
+}
+.cursor-ring {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(123,111,212,0.4);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: left 0.12s ease, top 0.12s ease, transform 0.2s ease;
+}
+
+/* Stars canvas */
+#stars {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 3rem;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s, background 0.3s;
+}
+nav.scrolled {
+  background: rgba(5,6,15,0.85);
+  backdrop-filter: blur(12px);
+  border-color: var(--border);
+}
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--purple); }
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-mid);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--purple-dim);
+  border-radius: 24px;
+  padding: 8px 20px;
+  cursor: none;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.nav-cta:hover { background: rgba(123,111,212,0.12); border-color: var(--purple); }
+
+/* HERO */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 2rem 80px;
+}
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.2s forwards;
+}
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(56px, 8vw, 110px);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.4s forwards;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--purple-light);
+}
+.hero-sub {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--text-mid);
+  max-width: 420px;
+  line-height: 1.75;
+  margin-bottom: 3rem;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.6s forwards;
+}
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 5rem;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.8s forwards;
+}
+.btn-primary {
+  background: var(--purple);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 28px;
+  border-radius: 28px;
+  border: none;
+  cursor: none;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-primary:hover { background: #6B5FC4; transform: translateY(-1px); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-mid);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 400;
+  padding: 12px 28px;
+  border-radius: 28px;
+  border: 1px solid var(--purple-muted);
+  cursor: none;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--purple-dim); }
+
+/* Pillow */
+.hero-pillow {
+  opacity: 0;
+  animation: fadeUp 1s 1s forwards;
+  position: relative;
+}
+.pillow-glow {
+  position: absolute;
+  bottom: -10px; left: 50%;
+  transform: translateX(-50%);
+  width: 360px; height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(90,70,200,0.25) 0%, transparent 70%);
+  filter: blur(8px);
+}
+.pillow-svg { animation: float 6s ease-in-out infinite; display: block; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+
+/* Stats bar */
+.stats {
+  position: relative; z-index: 1;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.stat {
+  flex: 1;
+  max-width: 200px;
+  padding: 2rem 1rem;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.stat:last-child { border-right: none; }
+.stat-num {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* FEATURES */
+.section {
+  position: relative; z-index: 1;
+  padding: 8rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--text);
+  margin-bottom: 4rem;
+  max-width: 600px;
+}
+.section-title em { font-style: italic; color: var(--purple-light); }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.feature {
+  background: var(--bg);
+  padding: 2.5rem 2rem;
+  transition: background 0.3s;
+}
+.feature:hover { background: var(--bg2); }
+.feature-icon {
+  width: 36px; height: 36px;
+  border: 1px solid var(--purple-muted);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.feature-icon svg { width: 18px; height: 18px; stroke: var(--purple); fill: none; stroke-width: 1.5; }
+.feature-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+.feature-desc {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-mid);
+  line-height: 1.75;
+}
+
+/* PRODUCT SECTION */
+.product-section {
+  position: relative; z-index: 1;
+  padding: 6rem 3rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.product-visual {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.product-ring {
+  position: absolute;
+  width: 340px; height: 340px;
+  border-radius: 50%;
+  border: 1px solid var(--purple-muted);
+  animation: spin 20s linear infinite;
+}
+.product-ring2 {
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  border: 1px solid rgba(61,56,112,0.3);
+  animation: spin 14s linear infinite reverse;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.product-pillow { animation: float 5s ease-in-out infinite; position: relative; z-index: 2; }
+.product-info { flex: 1; }
+.product-name {
+  font-family: var(--serif);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 1rem;
+}
+.product-title {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+.product-desc {
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--text-mid);
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+  max-width: 400px;
+}
+.product-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 2.5rem;
+  border: 1px solid var(--border);
+}
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.spec-row:last-child { border-bottom: none; }
+.spec-key { color: var(--text-dim); font-weight: 300; letter-spacing: 0.03em; }
+.spec-val { color: var(--text); font-weight: 400; }
+
+/* TESTIMONIALS */
+.testimonials {
+  position: relative; z-index: 1;
+  padding: 6rem 3rem;
+  border-top: 1px solid var(--border);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.testimonial {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  position: relative;
+}
+.testimonial::before {
+  content: '"';
+  font-family: var(--serif);
+  font-size: 60px;
+  font-weight: 300;
+  color: var(--purple-muted);
+  line-height: 1;
+  position: absolute;
+  top: 1rem; left: 1.5rem;
+}
+.testimonial-text {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--text-mid);
+  line-height: 1.7;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.testimonial-author {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.stars { color: var(--purple); font-size: 12px; margin-bottom: 0.5rem; }
+
+/* CTA SECTION */
+.cta-section {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 10rem 2rem;
+  border-top: 1px solid var(--border);
+}
+.cta-title {
+  font-family: var(--serif);
+  font-size: clamp(48px, 7vw, 90px);
+  font-weight: 300;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 2rem;
+}
+.cta-title em { font-style: italic; color: var(--purple-light); }
+.cta-sub {
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--text-mid);
+  margin-bottom: 3rem;
+}
+
+/* FOOTER */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 2.5rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+.footer-logo span { color: var(--purple-dim); }
+.footer-copy {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+}
+.footer-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+.footer-links a {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-dim);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--text-mid); }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  nav { padding: 1.25rem 1.5rem; }
+  .nav-links { display: none; }
+  .section, .product-section, .testimonials { padding: 4rem 1.5rem; }
+  .product-section { flex-direction: column; gap: 3rem; }
+  footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+  .stats { flex-wrap: wrap; }
+  .stat { min-width: 140px; }
+  body { cursor: auto; }
+  .cursor, .cursor-ring { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<canvas id="stars"></canvas>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">Lumora<span>Space</span></a>
+  <ul class="nav-links">
+    <li><a href="#features">Technology</a></li>
+    <li><a href="#product">The Pillow</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+  </ul>
+  <a href="#product" class="nav-cta">Shop Now</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Next-gen sleep technology</div>
+  <h1 class="hero-title">Sleep like<br>you're <em>weightless</em></h1>
+  <p class="hero-sub">Adaptive temperature. Zero-pressure support. Engineered for the space between waking and dreams.</p>
+  <div class="hero-btns">
+    <a href="#product" class="btn-primary">Explore the Pillow</a>
+    <a href="#features" class="btn-ghost">How it works</a>
+  </div>
+  <div class="hero-pillow">
+    <div class="pillow-glow"></div>
+    <svg class="pillow-svg" width="420" height="150" viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#3B348A"/>
+          <stop offset="100%" stop-color="#12104A"/>
+        </linearGradient>
+        <linearGradient id="shine" x1="15%" y1="10%" x2="70%" y2="80%">
+          <stop offset="0%" stop-color="#6B62CC" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#6B62CC" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <ellipse cx="210" cy="128" rx="180" ry="18" fill="#0A0830" opacity="0.5"/>
+      <rect x="12" y="28" width="396" height="86" rx="43" fill="url(#pg)"/>
+      <rect x="12" y="28" width="396" height="86" rx="43" fill="url(#shine)"/>
+      <rect x="12" y="28" width="396" height="86" rx="43" fill="none" stroke="#4840A0" stroke-width="0.6"/>
+      <ellipse cx="120" cy="54" rx="50" ry="13" fill="#7B72D8" opacity="0.12"/>
+      <line x1="55" y1="71" x2="365" y2="71" stroke="#2C2870" stroke-width="0.5"/>
+    </svg>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat reveal"><div class="stat-num">98°</div><div class="stat-label">Body temp sync</div></div>
+  <div class="stat reveal"><div class="stat-num">0.3s</div><div class="stat-label">Adaptive response</div></div>
+  <div class="stat reveal"><div class="stat-num">4.9★</div><div class="stat-label">Sleep rating</div></div>
+  <div class="stat reveal"><div class="stat-num">12yr</div><div class="stat-label">Warranty</div></div>
+  <div class="stat reveal"><div class="stat-num">∞</div><div class="stat-label">Dreams ahead</div></div>
+</div>
+
+<!-- FEATURES -->
+<div id="features" class="section">
+  <div class="section-label reveal">Technology</div>
+  <h2 class="section-title reveal">Built around <em>how you actually sleep</em></h2>
+  <div class="features-grid">
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 3v1m0 16v1M3 12h1m16 0h1M5.6 5.6l.7.7m11.4 11.4.7.7M5.6 18.4l.7-.7m11.4-11.4.7-.7M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+      </div>
+      <div class="feature-title">Adaptive Cooling</div>
+      <div class="feature-desc">Phase-change materials respond to your body temperature in real time, keeping the surface at an ideal 18–20°C all night.</div>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-6a4 4 0 100-8 4 4 0 000 8z"/></svg>
+      </div>
+      <div class="feature-title">Zero Pressure</div>
+      <div class="feature-desc">Our micro-lattice foam distributes weight across 8,000 contact points, eliminating pressure hot spots entirely.</div>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </div>
+      <div class="feature-title">Aligned Support</div>
+      <div class="feature-desc">Zoned firmness technology provides firm support at the neck and shoulders while staying cloud-soft everywhere else.</div>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="feature-title">Smart Layers</div>
+      <div class="feature-desc">Three independently tunable layers let you dial in the exact feel — from barely-there cloud to deep, grounded support.</div>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      </div>
+      <div class="feature-title">Breathable Cover</div>
+      <div class="feature-desc">TENCEL™ Lyocell outer shell is naturally breathable, moisture-wicking, and impossibly soft against skin.</div>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <div class="feature-title">Certified Clean</div>
+      <div class="feature-desc">OEKO-TEX® Standard 100 certified. No harmful chemicals, no off-gassing, no compromises on what touches your face.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT -->
+<div id="product">
+  <div class="product-section">
+    <div class="product-visual">
+      <div class="product-ring"></div>
+      <div class="product-ring2"></div>
+      <svg class="product-pillow" width="300" height="120" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pg2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4A4299"/>
+            <stop offset="100%" stop-color="#1A1660"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="150" cy="105" rx="120" ry="12" fill="#08062A" opacity="0.6"/>
+        <rect x="8" y="20" width="284" height="72" rx="36" fill="url(#pg2)"/>
+        <rect x="8" y="20" width="284" height="72" rx="36" fill="none" stroke="#5A52B8" stroke-width="0.5"/>
+        <ellipse cx="88" cy="42" rx="38" ry="10" fill="#7B72D8" opacity="0.18"/>
+        <line x1="40" y1="56" x2="260" y2="56" stroke="#3C3890" stroke-width="0.4"/>
+      </svg>
+    </div>
+    <div class="product-info reveal">
+      <div class="product-name">Signature Collection</div>
+      <h2 class="product-title">The LumoraSpace<br>Original Pillow</h2>
+      <p class="product-desc">Twelve months of materials research. Three generations of prototypes. One perfect night's sleep. The Original is our most refined pillow yet.</p>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">Fill</span><span class="spec-val">Micro-lattice adaptive foam</span></div>
+        <div class="spec-row"><span class="spec-key">Cover</span><span class="spec-val">TENCEL™ Lyocell + cooling fibre</span></div>
+        <div class="spec-row"><span class="spec-key">Height</span><span class="spec-val">Low / Mid / High (adjustable)</span></div>
+        <div class="spec-row"><span class="spec-key">Care</span><span class="spec-val">Machine washable</span></div>
+        <div class="spec-row"><span class="spec-key">Trial</span><span class="spec-val">100 nights free return</span></div>
+      </div>
+      <a href="#" class="btn-primary">Order Now — $189</a>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEWS -->
+<div id="reviews" class="testimonials">
+  <div class="section-label reveal">Reviews</div>
+  <h2 class="section-title reveal">What dreamers are <em>saying</em></h2>
+  <div class="testimonials-grid">
+    <div class="testimonial reveal">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">I've spent years chasing a good night's sleep. This pillow solved it in one night. I don't know how, but it feels like it was made exactly for my head.</p>
+      <div class="testimonial-author">— Sofia M., Berlin</div>
+    </div>
+    <div class="testimonial reveal">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">The cooling is real. I always sleep hot and I've tried everything. LumoraSpace is the first pillow that actually stays cool all night.</p>
+      <div class="testimonial-author">— James T., London</div>
+    </div>
+    <div class="testimonial reveal">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">Woke up with zero neck pain for the first time in three years. My physio couldn't believe the difference after two weeks.</p>
+      <div class="testimonial-author">— Anika R., Amsterdam</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title reveal">Your best sleep<br>starts <em>tonight</em></h2>
+  <p class="cta-sub reveal">100-night trial. Free returns. Free shipping worldwide.</p>
+  <div class="reveal">
+    <a href="#" class="btn-primary">Get LumoraSpace — $189</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Lumora<span>Space</span></div>
+  <ul class="footer-links">
+    <li><a href="#">Technology</a></li>
+    <li><a href="#">Returns</a></li>
+    <li><a href="#">Contact</a></li>
+    <li><a href="#">Privacy</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 LumoraSpace</div>
+</footer>
+
+<script>
+// Stars
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+const stars = Array.from({length: 140}, () => ({
+  x: Math.random(), y: Math.random(),
+  r: Math.random() * 1.4 + 0.2,
+  op: Math.random() * 0.45 + 0.05,
+  speed: Math.random() * 0.015 + 0.004,
+  phase: Math.random() * Math.PI * 2
+}));
+function drawStars(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    const a = s.op * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+    ctx.beginPath();
+    ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200,195,255,${a.toFixed(2)})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+requestAnimationFrame(drawStars);
+
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+  setTimeout(() => {
+    ring.style.left = mx + 'px';
+    ring.style.top = my + 'px';
+  }, 80);
+});
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2.5)'; });
+  el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; });
+});
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
